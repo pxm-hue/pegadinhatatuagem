@@ -124,41 +124,52 @@
   let checarPagamentoInterval = null;
 
   function iniciarPegadinha() {
-    const g = document.getElementById('nomeGarota').value.trim() || "Amor";
-    const a = document.getElementById('nomeAmigo').value.trim() || "Neném";
+  const g = document.getElementById('nomeGarota').value.trim() || "Amor";
+  const a = document.getElementById('nomeAmigo').value.trim() || "Neném";
 
-    // Insere os nomes com símbolos
-    document.getElementById('tattoo-garota').innerHTML = `${g} ♥`;
-    document.getElementById('tattoo-paulao').innerHTML = `💘 ${a}`;
+  // Insere os nomes
+  document.getElementById('tattoo-garota').innerHTML = `${g} ♥`;
+  document.getElementById('tattoo-paulao').innerHTML = `💘 ${a}`;
 
-    document.getElementById('box-form').style.display = 'none';
-    document.getElementById('box-video').style.display = 'block';
+  // Oculta o formulário e exibe a caixa de vídeo
+  document.getElementById('box-form').style.display = 'none';
+  document.getElementById('box-video').style.display = 'block';
 
-    const video = document.getElementById('meuVideo');
-    video.play();
+  const video = document.getElementById('meuVideo');
 
-    // Sincronização dos tempos no vídeo
-    video.ontimeupdate = function() {
-      const t = video.currentTime;
+  // Garante que o vídeo toque sem bloqueio do navegador
+  video.currentTime = 0;
+  var playPromise = video.play();
 
-      // Ajuste os tempos conforme seu vídeo (Ex: Garota de 2.0s a 7.5s, Paulão a partir de 7.5s)
-      if (t >= 2.0 && t < 7.5) {
-        document.getElementById('tattoo-garota').style.display = 'block';
-        document.getElementById('tattoo-paulao').style.display = 'none';
-      } else if (t >= 7.5) {
-        document.getElementById('tattoo-garota').style.display = 'none';
-        document.getElementById('tattoo-paulao').style.display = 'block';
-      } else {
-        document.getElementById('tattoo-garota').style.display = 'none';
-        document.getElementById('tattoo-paulao').style.display = 'none';
-      }
-    };
-
-    // Quando o vídeo termina, dispara o modal do Pix automaticamente
-    video.onended = function() {
-      gerarCobrancaPix();
-    };
+  if (playPromise !== undefined) {
+    playPromise.catch(function(error) {
+      console.log("Autoplay prevenido. Forçando play via código:", error);
+      video.muted = true; // Se o navegador barrar o áudio, toca mudo
+      video.play();
+    });
   }
+
+  // Sincronização das tatuagens nos tempos do vídeo
+  video.ontimeupdate = function() {
+    const t = video.currentTime;
+
+    if (t >= 2.0 && t < 7.5) {
+      document.getElementById('tattoo-garota').style.display = 'block';
+      document.getElementById('tattoo-paulao').style.display = 'none';
+    } else if (t >= 7.5) {
+      document.getElementById('tattoo-garota').style.display = 'none';
+      document.getElementById('tattoo-paulao').style.display = 'block';
+    } else {
+      document.getElementById('tattoo-garota').style.display = 'none';
+      document.getElementById('tattoo-paulao').style.display = 'none';
+    }
+  };
+
+  // Quando o vídeo termina, aciona o Pix
+  video.onended = function() {
+    gerarCobrancaPix();
+  };
+}
 
   // Gera a cobrança no Asaas
   async function gerarCobrancaPix() {
