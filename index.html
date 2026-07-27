@@ -141,12 +141,12 @@
         const t = video.currentTime;
 
         // CENA 1: A Garota aponta (Exemplo: dos 2s aos 7s do vídeo)
-        if (t >= 0.0 && t < 4.0) {
+        if (t >= 0.0 && t < 4.1) {
           document.getElementById('tattoo-garota').style.display = 'block';
           document.getElementById('tattoo-paulao').style.display = 'none';
         } 
         // CENA 2: O Paulão aponta (Exemplo: dos 8s em diante)
-        else if (t >= 4.0) {
+        else if (t >= 4.2) {
           document.getElementById('tattoo-garota').style.display = 'none';
           document.getElementById('tattoo-paulao').style.display = 'block';
         } else {
