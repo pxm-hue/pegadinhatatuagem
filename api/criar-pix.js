@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     const cobranca = await axios.post(`${ASAAS_URL}/payments`, {
       customer: 'cus_000005810283',
       billingType: 'PIX',
-      value: 4.90,
+      value: 2.00,
       dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
       description: 'Liberacao de Video - Pegadinha Tatuagem'
     }, {
