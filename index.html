@@ -118,58 +118,55 @@
     </div>
   </div>
 
-  <script>
+ <script>
   let codePixCopiaECola = "";
   let paymentID = "";
   let checarPagamentoInterval = null;
 
   function iniciarPegadinha() {
-  const g = document.getElementById('nomeGarota').value.trim() || "Amor";
-  const a = document.getElementById('nomeAmigo').value.trim() || "Neném";
+    const g = document.getElementById('nomeGarota').value.trim() || "Amor";
+    const a = document.getElementById('nomeAmigo').value.trim() || "Neném";
 
-  // Insere os nomes
-  document.getElementById('tattoo-garota').innerHTML = `${g} ♥`;
-  document.getElementById('tattoo-paulao').innerHTML = `💘 ${a}`;
+    // Insere os nomes com os símbolos
+    document.getElementById('tattoo-garota').innerHTML = g + " ♥";
+    document.getElementById('tattoo-paulao').innerHTML = "💘 " + a;
 
-  // Oculta o formulário e exibe a caixa de vídeo
-  document.getElementById('box-form').style.display = 'none';
-  document.getElementById('box-video').style.display = 'block';
+    document.getElementById('box-form').style.display = 'none';
+    document.getElementById('box-video').style.display = 'block';
 
-  const video = document.getElementById('meuVideo');
+    const video = document.getElementById('meuVideo');
+    video.currentTime = 0;
 
-  // Garante que o vídeo toque sem bloqueio do navegador
-  video.currentTime = 0;
-  var playPromise = video.play();
-
-  if (playPromise !== undefined) {
-    playPromise.catch(function(error) {
-      console.log("Autoplay prevenido. Forçando play via código:", error);
-      video.muted = true; // Se o navegador barrar o áudio, toca mudo
-      video.play();
-    });
-  }
-
-  // Sincronização das tatuagens nos tempos do vídeo
-  video.ontimeupdate = function() {
-    const t = video.currentTime;
-
-    if (t >= 2.0 && t < 7.5) {
-      document.getElementById('tattoo-garota').style.display = 'block';
-      document.getElementById('tattoo-paulao').style.display = 'none';
-    } else if (t >= 7.5) {
-      document.getElementById('tattoo-garota').style.display = 'none';
-      document.getElementById('tattoo-paulao').style.display = 'block';
-    } else {
-      document.getElementById('tattoo-garota').style.display = 'none';
-      document.getElementById('tattoo-paulao').style.display = 'none';
+    var playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(function(error) {
+        console.log("Autoplay barrado pelo navegador:", error);
+        video.muted = true;
+        video.play();
+      });
     }
-  };
 
-  // Quando o vídeo termina, aciona o Pix
-  video.onended = function() {
-    gerarCobrancaPix();
-  };
-}
+    // Sincronização dos tempos no vídeo
+    video.ontimeupdate = function() {
+      const t = video.currentTime;
+
+      if (t >= 2.0 && t < 7.5) {
+        document.getElementById('tattoo-garota').style.display = 'block';
+        document.getElementById('tattoo-paulao').style.display = 'none';
+      } else if (t >= 7.5) {
+        document.getElementById('tattoo-garota').style.display = 'none';
+        document.getElementById('tattoo-paulao').style.display = 'block';
+      } else {
+        document.getElementById('tattoo-garota').style.display = 'none';
+        document.getElementById('tattoo-paulao').style.display = 'none';
+      }
+    };
+
+    // Quando o vídeo termina, dispara o modal do Pix
+    video.onended = function() {
+      gerarCobrancaPix();
+    };
+  }
 
   // Gera a cobrança no Asaas
   async function gerarCobrancaPix() {
@@ -182,14 +179,12 @@
       codePixCopiaECola = data.pixCode;
       paymentID = data.paymentId;
 
-      // Renderiza o QR Code
-      document.getElementById('qr-code-area').innerHTML = `<img src="data:image/jpeg;base64,${data.qrCodeBase64}" style="width: 180px; height: 180px;" />`;
+      document.getElementById('qr-code-area').innerHTML = '<img src="data:image/jpeg;base64,' + data.qrCodeBase64 + '" style="width: 180px; height: 180px;" />';
       
-      // Inicia a verificação automática a cada 3 segundos
       monitorarPagamento();
 
     } catch (err) {
-      alert("Erro ao gerar chave PIX. Tente novamente.");
+      alert("Erro ao gerar PIX. Tente novamente.");
     }
   }
 
@@ -201,34 +196,32 @@
     }
   }
 
-  // Checa se o Pix foi pago sem o usuário precisar atualizar a página
+  // Checa se o Pix foi pago sem atualizar a página
   function monitorarPagamento() {
     checarPagamentoInterval = setInterval(async () => {
       if (!paymentID) return;
 
       try {
-        const res = await fetch(`/api/status-pagamento?id=${paymentID}`);
+        const res = await fetch('/api/status-pagamento?id=' + paymentID);
         const data = await res.json();
 
-        // Se o status for pago (RECEIVED ou CONFIRMED)
         if (data.pago) {
-          clearInterval(checarPagamentoInterval); // Para a checagem
+          clearInterval(checarPagamentoInterval);
 
           const nomeAmigo = document.getElementById('nomeAmigo').value || "Mano";
-          const linkDoSeuSite = window.location.href; // Pega a URL do seu site automaticamente
+          const linkDoSeuSite = window.location.href;
 
-          // LEGENDA AUTOMÁTICA DO WHATSAPP
-          const mensagemZap = `Mano, olha essa garota no estúdio de tatuagem com o seu nome (${nomeAmigo}) kkkkkkkkk 😂🔥\n\nCrie o seu também aqui: ${https://pegadinhatatuagem.vercel.app/}`;
+          // Texto sem quebras de template para evitar o erro de 'Missing }'
+          const textoZap = "Mano, olha essa garota no estúdio de tatuagem com o seu nome (" + nomeAmigo + ") kkkkkkkkk 😂🔥\n\nCrie o seu também aqui: " + linkDoSeuSite;
           
           alert("🎉 Pagamento Aprovado! Redirecionando para o WhatsApp...");
 
-          // Abre a tela de compartilhamento do WhatsApp
-          window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagemZap)}`;
+          window.location.href = "https://api.whatsapp.com/send?text=" + encodeURIComponent(textoZap);
         }
       } catch (e) {
         console.log("Aguardando pagamento...");
       }
-    }, 3000); // Roda a cada 3 segundos
+    }, 3000);
   }
 </script>
 </body>
