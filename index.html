@@ -171,20 +171,27 @@
   // Gera a cobrança no Asaas
   async function gerarCobrancaPix() {
     document.getElementById('modalPix').style.display = 'flex';
+    document.getElementById('qr-code-area').innerHTML = '<p style="color:white; font-size: 14px;">Gerando Pix...</p>';
     
     try {
       const response = await fetch('/api/criar-pix', { method: 'POST' });
       const data = await response.json();
 
-      codePixCopiaECola = data.pixCode;
-      paymentID = data.paymentId;
+      if (data.success) {
+        codePixCopiaECola = data.pixCode;
+        paymentID = data.paymentId;
 
-      document.getElementById('qr-code-area').innerHTML = '<img src="data:image/jpeg;base64,' + data.qrCodeBase64 + '" style="width: 180px; height: 180px;" />';
-      
-      monitorarPagamento();
+        // Renderiza o QR Code com sucesso
+        document.getElementById('qr-code-area').innerHTML = '<img src="data:image/png;base64,' + data.qrCodeBase64 + '" style="width: 180px; height: 180px; border-radius: 8px;" />';
+        
+        monitorarPagamento();
+      } else {
+        // Mostra na tela o motivo exato retornado pelo Asaas
+        document.getElementById('qr-code-area').innerHTML = '<div style="color: #ff6b6b; padding: 10px; font-size: 12px; text-align: center;"><b>Erro Asaas:</b><br>' + data.erroMensagem + '</div>';
+      }
 
     } catch (err) {
-      alert("Erro ao gerar PIX. Tente novamente.");
+      document.getElementById('qr-code-area').innerHTML = '<p style="color:#ff6b6b;">Erro de conexão com o servidor.</p>';
     }
   }
 
