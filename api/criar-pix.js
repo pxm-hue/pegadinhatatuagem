@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
   const ASAAS_API_KEY = '$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjJhMzVlNzJjLTE2YTMtNGM1My05ZjE3LWQ5YzVkMTMzZDRjODo6JGFhY2hfYmJmY2Q0MmItNjY1MS00NjcwLTg2ZDktOTZlOGJkNTMzZTdi'; 
   
   // 2. Cole aqui o ID do cliente que você copiou do painel do Asaas
-  const CUSTOMER_ID = 'cus_190028429'; 
+  const CUSTOMER_ID = 'cus_0000190028429'; 
 
   const ASAAS_URL = 'https://www.asaas.com/api/v3';
 
