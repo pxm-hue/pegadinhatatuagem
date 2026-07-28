@@ -150,10 +150,10 @@
     video.ontimeupdate = function() {
       const t = video.currentTime;
 
-      if (t >= 2.0 && t < 7.5) {
+      if (t >= 0.0 && t < 4.1) {
         document.getElementById('tattoo-garota').style.display = 'block';
         document.getElementById('tattoo-paulao').style.display = 'none';
-      } else if (t >= 7.5) {
+      } else if (t >= 4.1) {
         document.getElementById('tattoo-garota').style.display = 'none';
         document.getElementById('tattoo-paulao').style.display = 'block';
       } else {
